@@ -1,29 +1,38 @@
 # Reflection (Task 4e practice)
 
-Fill this in after `python -m src.app` runs successfully.
-
 ## Three errors
 
-Open `outputs/result.json`. The lists `test_index`, `actual` and
-`classifier.predicted` use the same order. Compare each prediction with its
-true label. When they differ, use the matching `test_index` value to locate
-the original ticket in `data/helpdesk_tickets.csv`.
+1. CSV row index **66**: predicted `log_only`, actually `assign_technician`.
+   The ticket was for a desktop with error code E21, a wait time of 18.0 minutes,
+   low reported severity, 3 reopened cases, and 129 characters in the resolution
+   notes. The model may have been influenced by the low severity and relatively
+   short wait time, even though the ticket had been reopened 3 times.
 
-1. CSV row index ___: predicted `___`, actually `___`. Which feature values
-   may have led the model towards the wrong class?
-2. CSV row index ___: predicted `___`, actually `___`. Which feature values
-   may have led the model towards the wrong class?
-3. CSV row index ___: predicted `___`, actually `___`. Which feature values
-   may have led the model towards the wrong class?
+2. CSV row index **81**: predicted `log_only`, actually `assign_technician`.
+   The ticket was for a desktop with error code E10, a wait time of 26.8 minutes,
+   medium reported severity, 0 reopened cases, and 94 characters in the resolution
+   notes. The model may have associated the E10 error code and the absence of
+   reopened cases with lower-priority tickets.
+
+3. CSV row index **172**: predicted `log_only`, actually `assign_technician`.
+   The ticket was for a printer with error code E10, a wait time of 21.4 minutes,
+   high reported severity, 1 reopened case, and 71 characters in the resolution
+   notes. The high severity suggests that the ticket may require more attention,
+   but the model still predicted `log_only`.
 
 ## One defensible improvement
 
-Describe one specific, defensible change to your features or preprocessing
-that might reduce these errors (not "use a bigger model" - something you
-could implement and test).
+One improvement would be to add interaction or derived features, such as a
+feature combining `reported_severity` with `reopened_count`. This could help the
+model capture cases where a ticket has high severity or has been reopened
+multiple times. The new feature could then be tested to see whether it reduces
+classification errors.
 
 ## One limitation
 
-State one bias, fairness, or deployment limitation of this classifier if it
-were actually used to route real help-desk tickets. Who could be affected,
-and how?
+If this classifier were used to route real help-desk tickets, incorrect
+predictions could affect users whose tickets are assigned to the wrong response
+tier. For example, a ticket that actually needs technician attention could be
+classified as `log_only`, which could delay the response. This is a deployment
+limitation because the model should not be the only decision-maker for
+higher-impact ticket routing.
